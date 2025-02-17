@@ -2,10 +2,10 @@ name: Automated Commit
 
 on:
   push:
-    branches: [main] # Ensures the workflow triggers on pushes to master
+    branches: [master] # Ensures the workflow triggers on pushes to master
 
   schedule:
-    - cron: '0 */12 * * *' # Executes every 12 hours
+    - cron: '0 0 * * *' # Executes every day
 
   workflow_dispatch: # Allows manual triggering from the GitHub UI
 
@@ -19,6 +19,15 @@ jobs:
     steps:
       - name: Setup Debug Information
         run: echo "::debug::Triggered by ref = ${{github.ref}}"
+
+      - name: Generate Random Delay
+        run: |
+          RANDOM_HOURS=$(( RANDOM % (168 - 12 + 1) + 12 ))
+          echo "RANDOM_HOURS=$RANDOM_HOURS" >> $GITHUB_ENV
+
+      - name: Wait for Random Delay
+        run: |
+          sleep $(( ${RANDOM_HOURS} * 3600 ))
 
       - name: Checkout Code
         uses: actions/checkout@v3 # Latest version for optimized performance
@@ -34,15 +43,15 @@ jobs:
       - name: Setup Git Configuration
         run: |
           git config user.email "mail"
-          git config user.name "name"
+          git config user.name "mail"
 
       - name: Prepare Commit
         run: |
-          commit_messages=("Update: ⏰" "Refresh: 🔄" "Renew: 🌟" "Revise: 📝" "Amend: 🛠" "Adjust: 🔧" "Change: 📈" "Modify: 🖊" "Transform: 🌀" "Revamp: 🌈")
+          commit_messages=("Update:" "Refresh:" "Renew:" "Revise:" "Amend:" "Adjust:" "Change:" "Modify:" "Transform:" "Revamp:")
           random_msg=${commit_messages[$RANDOM % ${#commit_messages[@]}]}
-
+          
           git add TIMESTAMP.txt
-          git commit -m "$random_msg - $current_time" || echo "No changes to commit."
+          git commit -m "$random_msg $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit."
 
       - name: GitHub Push
         uses: ad-m/github-push-action@v0.6.0
