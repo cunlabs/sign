@@ -22,7 +22,7 @@ jobs:
 
       - name: Generate Random Delay
         run: |
-          RANDOM_HOURS=$(( RANDOM % (168 - 12 + 1) + 12 ))
+          RANDOM_HOURS=$(( RANDOM % (24 - 12 + 1) + 12 ))
           echo "RANDOM_HOURS=$RANDOM_HOURS" >> $GITHUB_ENV
 
       - name: Wait for Random Delay
